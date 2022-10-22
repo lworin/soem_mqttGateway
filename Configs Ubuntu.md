@@ -1,9 +1,22 @@
-# Passo a Passo
+# Registro de configurações feitas no Ubuntu
 
 
-## MariaDB
+## 0. Pré-requisitos
 
-### Instalação e configuração do banco de dados MariaDB
+* Python 3.8
+* pip3
+
+```bash
+sudo apt install python3.8
+sudo apt install python3-pip
+```
+
+
+## 1. MariaDB
+
+### 1.1 Instalação e configuração
+
+Instalar o MariaDB, iniciar o serviço e adicionar/alterar no arquivo de configuração "50-server.cnf" uma linha para permitir acessos externos: `bind-address = 0.0.0.0`. [opcional]
 
 ```bash
 sudo apt update
@@ -13,71 +26,113 @@ sudo mysql_secure_installation
 sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
 ```
 
-Adicionar ao arquivo: `bind-address = 0.0.0.0`
+### 1.2 Criar uma base de dados e um usuário administrador
 
-
-### Criar uma database e um usuário
+Fazer o acesso ao MariaDB, criar uma database chamada "temp_sensors", e um usuário "admin" com todos os privilégios.
 
 ```bash
 sudo mariadb
-CREATE DATABASE mydb;
-CREATE USER luan@'%' IDENTIFIED BY '123';
-GRANT ALL ON *.* TO 'luan'@'%';
-FLUSH PRIVILEGES;
-SHOW GRANTS FOR 'luan'@'%';
-exit
 ```
 
-### Criando tabelas
+```sql
+CREATE DATABASE temp_sensors;
+CREATE USER admin@localhost IDENTIFIED BY '123';
+GRANT ALL ON *.* TO admin@localhost;
+FLUSH PRIVILEGES;
+```
+
+Comandos úteis:
+
+* Listar as bases de dados existentes: `SHOW DATABASES`
+* Listar os usuários existentes: `SELECT User FROM mysql.user;`
+* Listar as permissões: `SHOW GRANTS FOR admin@localhost;`
+* Sair do console MariaDB: `exit` ou `CTRL+C`
+
+### 1.3 Acessar como administrador e criar tabela
+
+Criamos uma tabela "received_data" com as colunas:
+
+* indice
+* device_id
+* data_hora
+* temperatura
+
+```bash
+sudo mariadb -u admin -p
+```
 
 ```sql
-create table sensors(
+use temp_sensors
+create table received_data(
     indice int auto_increment,
-    id int not null,
-    datahora timestamp,
-    temperatura int,
+    device_id int not null,
+    data_hora timestamp,
+    temperatura float,
     primary key(indice)
 );
 commit;
 ```
 
-### Teste de insert
+### 1.4 Teste de insert
+
+Nesse passo, inserimos uma linha para testar e consultamos.
+
 ```sql
-insert into sensors(id, datahora, temperatura)
-values(0001, "2022-10-19 21:13:07", 24);
+insert into received_data(device_id, data_hora, temperatura)
+values(3522, "2022-10-19 21:13:07", 24.0);
 commit;
+select * from received_data
 ```
 
 
-### Fontes
+## 2. Broker Mosquitto
 
-https://www.digitalocean.com/community/tutorials/how-to-install-mariadb-on-ubuntu-20-04
-https://mariadb.com/kb/en/configuring-mariadb-for-remote-client-access/
-https://www.daniloaz.com/en/how-to-create-a-user-in-mysql-mariadb-and-grant-permissions-on-a-specific-database/
+## 2.1 Instalação e configuração
+
+Instalar o Mosquitto e configurar um usuário para autenticação.
+
+```bash
+sudo apt-get install mosquitto mosquitto-clients
+sudo nano /etc/mosquitto/conf.d/my.conf
+```
+
+No arquivo "my.conf" inserir as linhas:
+
+`listener 1883`
+`allow_anonymous false`
+`acl_file /home/ubuntu/users/regras.txt`
+`password_file /home/ubuntu/users/senhas.txt`
+
+Criar os arquivos "regras.txt" e "senhas.txt" que são referenciados no arquivo "my.conf".
+
+```bash
+sudo nano /home/ubuntu/users/regras.txt
+```
+
+`user device`
+`topic readwrite temperatura`
+`topic readwrite teste`
+
+```bash
+sudo nano /home/ubuntu/users/senhas.txt
+```
 
 
 
+```bash
+sudo service mosquitto stop
+sudo service mosquitto start
+```
 
-## MariaDB Connector para Python3
 
-### Instalar o connector
+## 3. Instalação do MariaDB Connector para Python3
+
 ```bash
 sudo apt-get install -y libmariadb-dev
 pip3 install mariadb==1.0.11
 ```
 
-### Fontes
-
-https://mariadb.com/resources/blog/how-to-connect-python-programs-to-mariadb/
-
-
-## Broker Mosquitto
-
-```bash
-
-```
-
-## Paho MQTT Client para Python
+## 4. Instalação do Paho MQTT Client para Python
 
 ```bash
 pip3 install paho-mqtt
