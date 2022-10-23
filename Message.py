@@ -13,9 +13,9 @@ class Message:
         if len(lista) != 2:
             lista = ["0", "0"]
         
-        setDeviceid(lista[0])
+        self.setDeviceid(lista[0])
         self.datahora = str(datetime.datetime.now())
-        setTemperatura(lista[1])
+        self.setTemperatura(lista[1])
         self.insertString = "INSERT INTO ReceivedData(deviceid, datahora, temperatura) VALUES(?, ? ,?)"
 
     # Valida e seta o deviceid
