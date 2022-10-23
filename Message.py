@@ -19,7 +19,7 @@ class Message:
         self.insertString = "INSERT INTO ReceivedData(deviceid, datahora, temperatura) VALUES(?, ? ,?)"
 
     # Valida e seta o deviceid
-    def setDeviceid(dev):
+    def setDeviceid(self, dev):
         if len(dev) > 0:
             x = int(dev)
         else:
@@ -32,7 +32,7 @@ class Message:
             self.deviceid = 0
     
     # Valida e seta a temperatura
-    def setTemperatura(temp):
+    def setTemperatura(self, temp):
         if len(temp) > 0:
             x = float(temp)
         else:
