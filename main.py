@@ -3,8 +3,8 @@
 
 import sys
 import paho.mqtt.client as mqtt
-import DBConnection
-import Message
+from DBConnection import DBConnection
+from Message import Message
 
 # Configurações da base de dados
 dbUsername = "admin"

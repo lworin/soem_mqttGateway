@@ -3,7 +3,7 @@
 
 import sys
 import mariadb
-import DBConnection
+from DBConnection import DBConnection
 
 class Message:
     def __init__(self, dados):
