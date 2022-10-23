@@ -15,11 +15,11 @@ dbDatabase = "TempSensors"
 db = DBConnection(dbUsername, dbPassword, dbHost, dbPort, dbDatabase)
 
 # Configurações do broker MQTT
-mqttUser = "admin"
-mqttPassword = "123"
+mqttUser = "device"
+mqttPassword = "dev123"
 mqttHost = "localhost"
 mqttPort = 1883
-mqttTopic = "mytopics/temp"
+mqttTopic = "temperature"
 
 # Ao conectar ao broker
 def on_connect(client, userdata, flags, rc):

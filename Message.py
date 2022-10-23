@@ -11,11 +11,12 @@ class Message:
         self.deviceid = int(lista[0])
         self.datahora = lista[1]
         self.temperatura = float(lista[2])
+        self.insertString = "INSERT INTO ReceivedData(deviceid, datahora, temperatura) VALUES(?, ? ,?)"
 
     def enviar(self, db):
         try:
             db.connect()
-            db.cursor.execute("INSERT INTO TempSensors(deviceid, datahora, temperatura) VALUES(?, ? ,?)", (self.deviceid, self.datahora, self.temperatura))
+            db.cursor.execute(self.insertString, (self.deviceid, self.datahora, self.temperatura))
             db.connection.commit()
             print("Dados inseridos")
         except mariadb.Error as ex:
