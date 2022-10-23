@@ -32,6 +32,7 @@ def on_subscribe(client, obj, mid, granted_qos):
     print("Subscribed to: " + mqttTopic + " " + str(mid) + " " + str(granted_qos))
 
 # Ao receber mensagem do tópico assinado
+# Instancia um objeto Mensagem e realiza o envio
 def on_message(client, obj, msg):
     print("New message: " + msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     mensagem = Message(str(msg.payload.decode('utf8')))

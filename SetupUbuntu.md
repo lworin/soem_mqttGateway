@@ -5,7 +5,7 @@
 
 Instalar Python 3.8 e pip3.
 
-```bash
+```shell
 sudo apt install python3.8
 sudo apt install python3-pip
 python3 --version
@@ -15,7 +15,7 @@ pip3 --version
 
 ## 2. Instalação do MariaDB Connector para Python3
 
-```bash
+```shell
 sudo apt-get install -y libmariadb-dev
 pip3 install mariadb==1.0.11
 ```
@@ -23,7 +23,7 @@ pip3 install mariadb==1.0.11
 
 ## 3. Instalação do Paho MQTT Client para Python3
 
-```bash
+```shell
 pip3 install paho-mqtt
 ```
 
@@ -32,21 +32,28 @@ pip3 install paho-mqtt
 
 ### 4.1 Instalação e configuração
 
-Instalar o MariaDB, iniciar o serviço e adicionar/alterar no arquivo de configuração *50-server.cnf* uma linha para permitir acessos externos (opcional): `bind-address = 0.0.0.0`.
+Instalar o MariaDB e iniciar o serviço.
 
-```bash
+```shell
 sudo apt update
 sudo apt install mariadb-server
 sudo systemctl start mariadb.service
 sudo mysql_secure_installation
-sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
 ```
+
+ Opcional: adicionar/alterar no arquivo de configuração *50-server.cnf* uma linha para permitir acessos externos.
+
+```shell
+ sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+```
+ 
+ >bind-address = 0.0.0.0
 
 ### 4.2 Criar uma base de dados e um usuário administrador
 
 Fazer o acesso ao MariaDB, criar uma database chamada *TempSensors*, e um usuário *admin* com todos os privilégios.
 
-```bash
+```shell
 sudo mariadb
 ```
 
@@ -73,7 +80,7 @@ Criamos uma tabela *ReceivedData* com as colunas:
 * datahora
 * temperatura
 
-```bash
+```shell
 sudo mariadb -u admin -p
 ```
 
@@ -108,44 +115,50 @@ DELETE FROM ReceivedData WHERE deviceid=3522;
 
 Instalar o Mosquitto e abrir o arquivo *my.conf*.
 
-```bash
+```shell
 sudo apt-get install mosquitto mosquitto-clients
 sudo nano /etc/mosquitto/conf.d/my.conf
 ```
 
 No arquivo *my.conf* inserir as linhas:
 
-`listener 1883`
-
-`allow_anonymous false`
-
-`acl_file /home/ubuntu/users/regras.txt`
-
-`password_file /home/ubuntu/users/senhas.txt`
+>listener 1883  
+allow_anonymous false  
+acl_file /home/ubuntu/users/regras.txt  
+password_file /home/ubuntu/users/senhas.txt
 
 ### 5.2 Autenticação e criação de usuário
 
 Criar os arquivos *senhas.txt* e *regras.txt* que são referenciados no arquivo *my.conf*.
 
-```bash
-sudo nano /home/ubuntu/users/senhas.txt
-sudo nano /home/ubuntu/users/regras.txt
+```shell
+sudo touch /home/ubuntu/users/senhas.txt
+sudo touch /home/ubuntu/users/regras.txt
 ```
 
 Criar o usuário *device* com senha *dev123*.
 
-```bash
+```shell
 sudo mosquitto_passwd -b /home/ubuntu/users/senhas.txt device dev123
 ```
 
 No arquivo *regras.txt*, inserir as linhas abaixo para permitir acesso ao tópico *temperatura*.
 
-`user device`
+```shell
+sudo nano /home/ubuntu/users/regras.txt
+```
 
-`topic readwrite temperature`
+>user device  
+topic readwrite temperature
 
 Reiniciar o serviço
 
-```bash
+```shell
 sudo service mosquitto restart
+```
+
+### 5.3 Exemplo de publicação
+
+```shell
+sudo mosquitto_pub -h localhost -p 1883 -u device -P dev123  -t temperature -m '5589#2022-10-23 11:40:30#25.7'
 ```
