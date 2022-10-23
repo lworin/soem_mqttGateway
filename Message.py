@@ -3,19 +3,55 @@
 
 import sys
 import mariadb
+import datetime
 from DBConnection import DBConnection
 
 class Message:
     def __init__(self, dados):
-        lista = dados.split("#", 2)
-        self.deviceid = int(lista[0])
-        self.datahora = lista[1]
-        self.temperatura = float(lista[2])
+        lista = dados.split("#", 1)
+
+        if len(lista) != 2:
+            lista = ["0", "0"]
+        
+        setDeviceid(lista[0])
+        self.datahora = str(datetime.datetime.now())
+        setTemperatura(lista[1])
         self.insertString = "INSERT INTO ReceivedData(deviceid, datahora, temperatura) VALUES(?, ? ,?)"
 
+    # Valida e seta o deviceid
+    def setDeviceid(dev):
+        if len(dev) > 0:
+            x = int(dev)
+        else:
+            self.deviceid = 0
+            return
+        
+        if x > 0:
+            self.deviceid = x
+        else:
+            self.deviceid = 0
+    
+    # Valida e seta a temperatura
+    def setTemperatura(temp):
+        if len(temp) > 0:
+            x = float(temp)
+        else:
+            self.temperatura = 0
+            return
+        
+        if x > 0:
+            self.temperatura = x
+        else:
+            self.temperatura = 0
+
+    # Faz o envio da mensagem
     def enviar(self, db):
+        if self.deviceid == 0 or self.temperatura == 0:
+            print("Dados invalidos")
+            return
+
         try:
-            print("Inserindo: " + str(self.deviceid) + ", " + str(self.datahora) + ", " + str(self.temperatura))
+            print("Inserindo: " + str(self.deviceid) + ", " + self.datahora + ", " + str(self.temperatura))
             db.connect()
             db.cursor.execute(self.insertString, (self.deviceid, self.datahora, self.temperatura))
             db.connection.commit()
