@@ -13,6 +13,7 @@ class DBConnection:
         self.port = port
         self.database = database
 
+    # Abre coneão com o banco de dados e obtém o cursor
     def connect(self):
         try:
             self.connection = mariadb.connect(user = self.username, password = self.password, host = self.host, port = int(self.port), database = self.database)
@@ -21,5 +22,7 @@ class DBConnection:
             print(f"Erro ao conectar: {ex}") 
             sys.exit(1)
 
+    # Desconecta do banco de dados
     def disconnect(self):
+        self.cursor.close()
         self.connection.close()
