@@ -15,7 +15,7 @@ class Message:
 
     def enviar(self, db):
         try:
-            print("Inserindo: " + self.deviceid + ", " + self.datahora + ", " + self.temperatura)
+            print("Inserindo: " + str(self.deviceid) + ", " + str(self.datahora) + ", " + str(self.temperatura))
             db.connect()
             db.cursor.execute(self.insertString, (self.deviceid, self.datahora, self.temperatura))
             db.connection.commit()
