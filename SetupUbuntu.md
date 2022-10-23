@@ -160,5 +160,5 @@ sudo service mosquitto restart
 ### 5.3 Exemplo de publicação
 
 ```shell
-sudo mosquitto_pub -h localhost -p 1883 -u device -P dev123  -t temperature -m '5589#2022-10-23 11:40:30#25.7'
+sudo mosquitto_pub -h localhost -p 1883 -u device -P dev123 -t temperature -m '5589#25.7'
 ```
